@@ -56,4 +56,12 @@ app.use(function(res,req,next){
     res.locals.error_msg = req.flash('error_msg');
     res.locals.error = req.flash('error');
     next();
-})
+});
+
+app.use('/', routes);
+app.use('/users', users);
+
+app.set('port', (process.nextTick.PORT || 3000));
+app.listen(app.get('port',function(){
+    console.log('server' +app.get('port'));
+}));
