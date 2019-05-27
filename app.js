@@ -1,70 +1,62 @@
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var exphbs = require('express-handlebars');
-var expressValidator = require('express-validator');
-var flash = require('connect-flash');
-var session = require('express-session');
-var passport = require('passport');
-var LocalStrategy = require('express');
-var mongo = require('mongodb');
-var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/loginapp', { useNewUrlParser: true });
-var db = mongoose.connection;
+const express = require('express');
+const expressLayouts = require('express-ejs-layouts');
+const mongoose = require('mongoose');
+const passport = require('passport');
+const flash = require('connect-flash');
+const session = require('express-session');
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
+const app = express();
 
-var app = express();
-app.set('views',path.join(__dirname, 'views'));
-app.engine('handlebars',exphbs({defaultLayout:"layout"}));
-app.set('view engine', 'handlebars');
+// Passport Config
+require('./config/passport')(passport);
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+// DB Config
+const db = require('./config/keys').mongoURI;
 
-app.use(express.static(path.join(__dirname,'public')));
+// Connect to MongoDB
+mongoose
+  .connect(
+    db,
+    { useNewUrlParser: true }
+  )
+  .then(() => console.log('MongoDB Connected'))
+  .catch(err => console.log(err));
 
-app.use(session({
-    session: 'secret',
-    saveUninitialized: true,
-    resave: true
-}));
+// EJS
+app.use(expressLayouts);
+app.set('view engine', 'ejs');
 
+// Express body parser
+app.use(express.urlencoded({ extended: true }));
+
+// Express session
+app.use(
+  session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true
+  })
+);
+
+// Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(expressValidator({
-    errorFormatter: function(param, msg, value){
-        var namespace = param.split('.'),
-        root = namespace.shift(),
-        formParam = root;
-        while(namespace.length){
-            formParam += '[' + namespace.shift() + ']';
-        }
-        return{
-            param : formParam,
-            msg : msg,
-            value : value
-        };
-    }
-}));
-
+// Connect flash
 app.use(flash());
 
-app.use(function(res,req,next){
-    res.locals.success_msg = req.flash('success_msg');
-    res.locals.error_msg = req.flash('error_msg');
-    res.locals.error = req.flash('error');
-    next();
+// Global variables
+app.use(function(req, res, next) {
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg = req.flash('error_msg');
+  res.locals.error = req.flash('error');
+  next();
 });
 
-app.use('/', routes);
-app.use('/users', users);
+// Routes
+app.use('/', require('./routes/index.js'));
+app.use('/users', require('./routes/users.js'));
 
-app.set('port', (process.nextTick.PORT || 3000));
-app.listen(app.get('port',function(){
-    console.log('server' +app.get('port'));
-}));
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, console.log(`Server started on port ${PORT}`));
