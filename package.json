@@ -1,15 +1,8 @@
 {
-  "name": "node_passport_login",
-  "version": "2.0.0",
-  "description": "Node.js authentication with Passport",
+  "name": "loginpassportnodejs",
+  "version": "1.0.0",
+  "description": "login form mean app",
   "main": "app.js",
-  "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "connect-flash": "^0.1.1",
@@ -23,5 +16,18 @@
   },
   "devDependencies": {
     "nodemon": "^1.18.9"
-  }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChinmayShringi/LoginPassportNodejs.git"
+  },
+  "author": "Chinmay Shringi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ChinmayShringi/LoginPassportNodejs/issues"
+  },
+  "homepage": "https://github.com/ChinmayShringi/LoginPassportNodejs#readme"
 }
